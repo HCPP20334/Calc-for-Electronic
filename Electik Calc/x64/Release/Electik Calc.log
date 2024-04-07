@@ -1,0 +1,4 @@
+﻿LINK : warning LNK4044: нераспознанный параметр "/Ob2"; игнорируется
+LINK : warning LNK4075: не учитывается "/INCREMENTAL" из-за спецификации "/LTCG"
+MSVCRT.lib(exe_main.obj) : error LNK2001: неразрешенный внешний символ main.
+C:\Users\Администратор\Desktop\my_projects\C++\JE\JEx64GUI\Electik Calc\x64\Release\Electik Calc.exe : fatal error LNK1120: неразрешенных внешних элементов: 1

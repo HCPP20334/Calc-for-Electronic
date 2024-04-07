@@ -1,0 +1,10 @@
+﻿  main.cpp
+C:\Users\Администратор\Desktop\my_projects\C++\JE\JEx64GUI\Electik Calc\main.cpp(42,14): warning C4100: argc: неиспользованный формальный параметр
+C:\Users\Администратор\Desktop\my_projects\C++\JE\JEx64GUI\Electik Calc\main.cpp(100,14): warning C4189: v_titleS: локальная переменная инициализирована, но не использована
+C:\Users\Администратор\Desktop\my_projects\C++\JE\JEx64GUI\Electik Calc\main.cpp(246,19): warning C4189: fdata_0: локальная переменная инициализирована, но не использована
+  Создание кода
+  1 of 1598 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    25 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  Electik Calc.vcxproj -> C:\Users\Администратор\Desktop\my_projects\C++\JE\JEx64GUI\Electik Calc\Release\Electik Calc.exe
