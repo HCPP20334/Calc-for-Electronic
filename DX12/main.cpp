@@ -125,7 +125,7 @@ int main(int, char**)
     //ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ELectric Calc DX12", nullptr };
     ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"ELectric Calc DX12", WS_OVERLAPPEDWINDOW, 100, 100, 500, 600, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Калькулятор Электроника v 1.0.1(beta)_DX12 x64", WS_OVERLAPPEDWINDOW, 100, 100, 500, 600, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -286,7 +286,7 @@ int main(int, char**)
         ImGui::NewFrame();
 
         std::cout << "GPU: Unit OK" << std::endl;
-        ImGui::Begin("Калькулятор Электроника v 1.0.1(beta)_DX12 x64", &fFr_main);
+        ImGui::Begin("Калькулятор Электроника v 1.0.1(beta)_DX12 x64", &fFr_main, ImGuiWindowFlags_NoTitleBar);
         //std::cout << "GPU: Render Frame:"<<io.Framerate << std::endl;
         ImGuiStyle& style = ImGui::GetStyle();
         if (bDarkStyle) {
