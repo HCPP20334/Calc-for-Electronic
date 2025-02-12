@@ -1,4 +1,4 @@
-
+﻿
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
@@ -44,6 +44,7 @@ static bool fTable = false;
 static bool fNautomat = false;
 static bool fC_phase = false;
 static bool fFramePH = false;//(fPV * fPV / fPR);
+static bool fC_balast = false;
 int64_t* fA_stack = 0;
 static bool fCAboutW;
 int fN = 1;
@@ -113,7 +114,7 @@ int main(int argc, char** argv)
     wc.hIcon = LoadIcon(wc.hInstance, MAKEINTRESOURCE(101));
     ::RegisterClassExW(&wc);
 
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Electrik Calc", WS_OVERLAPPEDWINDOW, 100, 100, 500, 600, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Калькулятор электроника v 1.0.2(beta)OpenGL3.3", WS_OVERLAPPEDWINDOW, 100, 100, 500, 600, nullptr, nullptr, wc.hInstance, nullptr);
     // Initialize OpenGL
     if (!CreateDeviceWGL(hwnd, &g_MainWindow))
     {
@@ -145,7 +146,7 @@ int main(int argc, char** argv)
     //window_flags |= ImGuiWindowFlags_NoTitleBar;
     //\\io.Fonts->AddFontDefault();
     ImFontAtlas* fonts = ImGui::GetIO().Fonts;
-    fonts->AddFontFromFileTTF(".\\WhiteRabbit2.ttf", 20.0f,NULL);
+    fonts->AddFontFromFileTTF("WhiteRabbit2.ttf", 20.0f, nullptr, io.Fonts->GetGlyphRangesCyrillic());
         //glyphRangesBuilder.AddRanges(getLangGlyphRanges());
     //io.AddInputCharacter();
     // Main loop
@@ -167,6 +168,11 @@ int main(int argc, char** argv)
     int64_t fStyleCount = 0;
     static bool f4800Offset = false;
     static bool f2800Offset = false;
+    //
+    float fU2 = 0.0f;
+    float fU1 = 0.0f;
+    float fCoutData = 0.0f;
+    int fIdata = 0;
     //
     int fAbuffer = 0;
     int fVbuffer = 0;
@@ -237,12 +243,12 @@ int main(int argc, char** argv)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         std::cout << "GPU: Unit OK" << std::endl;
-        ImGui::Begin(" Calc for Electic v 1.0.1(beta)", &fFr_main);
+        ImGui::Begin("Калькулятор электроника v 1.0.2(beta)OpenGL3.3", &fFr_main, ImGuiWindowFlags_NoTitleBar);
         //std::cout << "GPU: Render Frame:"<<io.Framerate << std::endl;
         ImGuiStyle& style = ImGui::GetStyle();
         if (bDarkStyle) {
             style.WindowRounding = 5.3f;
-            style.FrameRounding = 2.3f;
+            style.FrameRounding = 0.0f;
             style.ScrollbarRounding = 0;
             style.Colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
             style.Colors[ImGuiCol_WindowBg] = ImVec4(0.01f, 0.01f, 0.02f, 1.0f);
@@ -280,9 +286,9 @@ int main(int argc, char** argv)
         }
         if (!bDarkStyle) {
             style.WindowRounding = 5.3f;
-            style.FrameRounding = 2.3f;
+            style.FrameRounding = 0.0f;
             style.ScrollbarRounding = 0;
-            style.Colors[ImGuiCol_Text] = ImVec4(0.20f, 1.0f, 0.40f, 1.0f);
+            style.Colors[ImGuiCol_Text] = ImVec4(0.1f, 0.09f, 0.09f, 1.0f);
             style.Colors[ImGuiCol_WindowBg] = ImVec4(1.01f, 1.01f, 1.02f, 1.0f);
             style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
             style.Colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.05f, 0.10f, 0.85f);
@@ -349,12 +355,11 @@ int main(int argc, char** argv)
         CurrentMemoryBuffer.ClearFreeMemory();
         if (bWindow0) {
             ImGui::Begin("window_0", &bWindow0, ImGuiWindowFlags_NoTitleBar);
-            if (ImGui::Button("X",ImVec2(32.0f,32.0f))) { bWindow0 = false; }
-            ImGui::Text("Electrik Calc v 1.0.1(beta)");
-            ImGui::Text("-------------------------------");
-            ImGui::Text("Thanks you to used My App!!");
-            ImGui::Text("[ESC] - Exit App");
-            ImGui::Text("[T] - Change Theme (dark, white)");
+            if (ImGui::Button("X", ImVec2(32.0f, 32.0f))) { bWindow0 = false; }
+            ImGui::Text("Калькулятор элктроника v 1.0.2");
+            ImGui::Text("Спасибо что используете мое приложение!!");
+            ImGui::Text("[ESC] - Выйти из Приложения");
+            ImGui::Text("[T] - Сменить Тему (Темная, Светлая)");
             if (ImGui::Button("OK")) {
                 bWindow0 = false;
             }
@@ -363,54 +368,94 @@ int main(int argc, char** argv)
         if (bWindow1) {//
             ImGui::Begin("window_0", &bWindow1, ImGuiWindowFlags_NoTitleBar);
             if (ImGui::Button("X", ImVec2(32.0f, 32.0f))) { bWindow1 = false; }
-            ImGui::Text("Electrik Calc v 1.0");
+            ImGui::Text("Калькулятор элктроника v 1.0.2");
             ImGui::Text("-------------------------------");
-            ImGui::Text("           You Are Exit?");
+            ImGui::Text("           Вы точно хотите выйти?");
             ImGui::Text("\t\t\t");
             ImGui::SameLine();
-            if (ImGui::Button("OK", ImVec2(32.f, 32.0f)))
+            if (ImGui::Button("ДА", ImVec2(32.f, 32.0f)))
             {
                 //
                 exit(0);
             }
             ImGui::SameLine();
-            if (ImGui::Button("Cancel", ImVec2(64.0f, 32.0f)))
+            if (ImGui::Button("Отмена", ImVec2(64.0f, 32.0f)))
             {
                 //
                 bWindow1 = false;
             }
             ImGui::End();
         }
-        if (ImGui::Button("Watt to Amper", ImVec2(150.f, 50.0f)))
+        if (ImGui::Button("Ватты в Амперы", ImVec2(150.f, 50.0f)))
         {
             //
             fFrameWA = true;
         }
         ImGui::SameLine();
-        if (ImGui::Button("Get Om", ImVec2(100.f, 50.0f)))
+        if (ImGui::Button("Расчет ОМА", ImVec2(100.f, 50.0f)))
         {
             //
             fFrameOM = true;
         }
         ImGui::SameLine();
-        if (ImGui::Button("calc diameter wire", ImVec2(200.f, 50.0f)))
+        if (ImGui::Button("Расчет диаметра провода", ImVec2(200.f, 50.0f)))
         {
             //
             fFrameDIA = true;
         }
-        if (ImGui::Button("P Heater", ImVec2(150.f, 50.0f)))
+        if (ImGui::Button("P Тена", ImVec2(150.f, 50.0f)))
         {
             //
             fFramePH = true;
         }
         ImGui::SameLine();
-        if (ImGui::Button("Calc Nominal Automat", ImVec2(300.f, 50.0f)))
+        if (ImGui::Button("Расчет Номинала Автомата", ImVec2(300.f, 50.0f)))
         {
             fNautomat = true;
         }
-        if (ImGui::Button("Calc Phase shifting Caputulator", ImVec2(300.f, 50.0f)))
+        if (ImGui::Button("Расчет Фазосдвигающего\nКонденсатора", ImVec2(300.f, 50.0f)))
         {
             fC_phase = true;
+        }
+        if (ImGui::Button("Расчет баластного\nКонденсатора", ImVec2(300.f, 50.0f)))
+        {
+            fC_balast = true;
+        }
+        if (fC_balast) {
+            fFrameOM = false;
+            fFrameDIA = false;
+            fFrameWA = false;
+            fFramePH = false;
+            fTable = false;
+            fNautomat = false;
+            fC_phase = false;
+            //Uобщая= √((U1 * U1)-(U2 * U2))
+           // C = 3200 * I / Uобщая;
+            int64_t fUoutData = sqrt((fU1 * fU1) - (fU2 * fU2));
+            ImGui::Begin("Расчет Баластного Конденсатора", &fC_balast);
+            CurrentMemoryBuffer.ClearFreeMemory();
+            if (ImGui::Button("X")) { fC_balast = false; }
+            ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
+            ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
+            ImGui::Text(("C:" + std::to_string(fCoutData)+" :мкф").c_str());
+            ImGui::InputFloat("U_нагрузки:", &fU2, 0.0f, 10000);
+            ImGui::InputFloat("U_Входное :", &fU1, 0.0f, 10000);
+            ImGui::InputInt(" I:", &fIdata, 0, 10000);
+            if (fU1 < 1 && fU2 < 1) {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.033f, 1.0f), "Ошибка: Деление на ноль нельзя!!\nВведите все данные ");
+            }
+            if (fU1 < 1 && fU2 > 0) {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.033f, 1.0f), "Ошибка: Деление на ноль нельзя!!\nВведите  U_Входное :");
+            }
+            if (fU1 > 0 && fU2 < 1) {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.033f, 1.0f), "Ошибка: Деление на ноль нельзя!!\nВведите U_нагрузки:");
+            }
+            if (fU1 > 0 && fU2 > 0) {
+                if (ImGui::Button("Расчитать")) {
+                    fCoutData = (3200 * fIdata / fUoutData);
+                }
+            }
+            ImGui::End();
         }
         if (fC_phase) {
             fFrameOM = false;
@@ -419,6 +464,7 @@ int main(int argc, char** argv)
             fFramePH = false;
             fTable = false;
             fNautomat = false;
+            fC_balast = false;
             if (f4800Offset) {
                 fp = 0; fOval = 4800;
             }
@@ -426,42 +472,42 @@ int main(int argc, char** argv)
                 fp = 1; fOval = 2800;
             }
             //
-            std::string fStrOffsetValue[] = { "Triagle","Star" };
+            std::string fStrOffsetValue[] = { "Треугольник","Звезда" };
             //
-            ImGui::Begin("Phase C to Motor", &fC_phase);
-            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (fD_gpuModel + ": fps_count:" + std::to_string(io.Framerate)).c_str());
+            ImGui::Begin("Расчет Фазосдвигающего Конденсатора", &fC_phase);
+            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (std::to_string(io.Framerate)).c_str());
             CurrentMemoryBuffer.ClearFreeMemory();
             if (ImGui::Button("X")) { fC_phase = false; }
             ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
             ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
-            if (ImGui::Button("Triagle", ImVec2(200.f, 50.0f))) {
+            if (ImGui::Button("Треугольник", ImVec2(200.f, 50.0f))) {
                 f2800Offset = false;
                 f4800Offset = true;
                 ///fCOffset = std::to_string(fOval * fAbuffer / fVbuffer) + "mKf";
             }
             ImGui::SameLine();
-            if (ImGui::Button("Star", ImVec2(200.f, 50.0f))) {
+            if (ImGui::Button("Звезда", ImVec2(200.f, 50.0f))) {
                 f2800Offset = true;
                 f4800Offset = false;
                 //fCOffset = std::to_string(fOval * fAbuffer / fVbuffer) + "mKf";
             }
-            ImGui::Text(("Mode:" + fStrOffsetValue[fp]).c_str());
+            ImGui::Text(("Тип:" + fStrOffsetValue[fp]).c_str());
             ImGui::Text(("C:" + fCOffset).c_str());
-            ImGui::InputInt("A motor:", &fAbuffer, 1, 100, 1);
-            ImGui::InputInt("V motor:", &fVbuffer, 1, 100, 1);
+            ImGui::InputInt("A мотора:", &fAbuffer, 1, 100, 1);
+            ImGui::InputInt("V мотора:", &fVbuffer, 1, 100, 1);
             if (fVbuffer < 1) {
-                ImGui::Text("Error: V != 0!!");
+                ImGui::Text("Ошибка: V не может быть равна 0!!");
             }
             if (fVbuffer > 0) {
-                if (ImGui::Button("Calc", ImVec2(300.f, 50.0f))) {
-                    fCOffset = std::to_string(fOval * fAbuffer / fVbuffer) + "mKf";
+                if (ImGui::Button("Расчитать", ImVec2(300.f, 50.0f))) {
+                    fCOffset = std::to_string(fOval * fAbuffer / fVbuffer) + "мкф";
                 }
             }
-            //   fC_value.innerHTML = parseFloat(fMtype * fDI / fDV) + " ���";
+            //   fC_value.innerHTML = parseFloat(fMtype * fDI / fDV) + " ���";
             ImGui::End();
         }
-        std::string fStrNominal = "\n1.13 is the short-term tripping\n current of the circuit\n1.45 is the tripping current\n at which the machine should not turn off";
-        std::string fStrNominal1 = "\n2.55 - current at which the\n machine must turn off within 1 minute.\n5 - emergency overload current at\n which the machine must turn off within 10 seconds \n10 - emergency overload current at\n which the machine must turn off";
+        std::string fStrNominal = "\n1.13 — ток кратковременного отключения\n цепи\n1.45 — ток отключения\n, при котором машина не должна выключаться";
+        std::string fStrNominal1 = "\n2.55 - ток, при котором\n машина должна выключиться в течение 1 минуты.\n5 - ток аварийной перегрузки,\n при которой машина должна выключиться в течение 10 секунд \n10 - ток аварийной перегрузки, при которой\n машина должна выключиться выключать";
         int64_t fNin[] = { 13,45,155,400,900 };
         if (fNautomat) {
             fFrameOM = false;
@@ -471,38 +517,55 @@ int main(int argc, char** argv)
             fTable = false;
             //
             //
-            ImGui::Begin("Calc Nominal Automat (idea DIMA XP)", &fNautomat);
-            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (fD_gpuModel + ": fps_count:" + std::to_string(io.Framerate)).c_str());
-            if (fNin_0) { fNinOffset = fNin[0]; }
-            if (fNin_1) { fNinOffset = fNin[1]; }
-            if (fNin_2) { fNinOffset = fNin[2]; }
-            if (fNin_3) { fNinOffset = fNin[3]; }
-            if (fNin_4) { fNinOffset = fNin[4]; }
+            ImGui::Begin("Расчет номинала автомата (Идея DIMA XP)", &fNautomat);
+            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (": fps_count:" + std::to_string(io.Framerate)).c_str());
+          static  const char* button_idStr[] = { "1.13","1.45","2.55","5","10" };
+          static  std::string b0_str = button_idStr[0];
+          static  std::string b1_str = button_idStr[1];
+          static  std::string b2_str = button_idStr[2];
+          static  std::string b3_str = button_idStr[3];
+          static  std::string b4_str = button_idStr[4];
+            if (fNin_0) { fNinOffset = fNin[0];}
+            if (fNin_1) { fNinOffset = fNin[1];}
+            if (fNin_2) { fNinOffset = fNin[2];}
+            if (fNin_3) { fNinOffset = fNin[3];}
+            if (fNin_4) { fNinOffset = fNin[4];}
+             //
             ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
             ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
             if (ImGui::Button("X")) { fNautomat = false; }
             // parseInt(fNdata) + (parseInt(fNdata) * (fProcentArray[fCPoint] / 100));
             ImGui::Text(("A:" + std::to_string(rs)).c_str());
-            if(ImGui::Button("1.13", ImVec2(64.0f, 64.0f))) { fNinOffset = fNin[0]; }
+            if (ImGui::Button((b0_str).c_str(), ImVec2(64.0f, 64.0f))) {
+                fNinOffset = fNin[0]; b0_str = "[1.13]"; b1_str = button_idStr[1]; b2_str = button_idStr[2]; b3_str = button_idStr[3]; b4_str = button_idStr[4];
+            }
             ImGui::SameLine();
-            if (ImGui::Button("1.45", ImVec2(64.0f, 64.0f))) { fNinOffset = fNin[1]; }
+            if (ImGui::Button((b1_str).c_str(), ImVec2(64.0f, 64.0f))) { 
+                fNinOffset = fNin[1];  b1_str = "[1.45]"; b0_str = button_idStr[0]; b2_str = button_idStr[2]; b3_str = button_idStr[3]; b4_str = button_idStr[4];
+            }
             ImGui::SameLine();
-            if (ImGui::Button("2.55", ImVec2(64.0f, 64.0f))) { fNinOffset = fNin[2]; }
+            if (ImGui::Button((b2_str).c_str(), ImVec2(64.0f, 64.0f))) { 
+                fNinOffset = fNin[2]; b2_str = "[2.55]"; b1_str = button_idStr[1]; b0_str = button_idStr[0]; b3_str = button_idStr[3]; b4_str = button_idStr[4];
+            }
             ImGui::SameLine();
-            if (ImGui::Button("5", ImVec2(64.0f, 64.0f))) { fNinOffset = fNin[3]; }
+            if (ImGui::Button((b3_str).c_str(), ImVec2(64.0f, 64.0f))) { 
+                fNinOffset = fNin[3]; b3_str = "[ 5 ]"; b1_str = button_idStr[1]; b2_str = button_idStr[2]; b0_str = button_idStr[0]; b4_str = button_idStr[4];
+            }
             ImGui::SameLine();
-            if (ImGui::Button("10", ImVec2(64.0f, 64.0f))) { fNinOffset = fNin[4]; }
-            ImGui::InputInt("Nominal A:", &fN, 1, 100, 0);
-            ImGui::Text(("Changed:" + std::to_string(fNinOffset)+"in:"+std::to_string(fN)).c_str());
+            if (ImGui::Button((b4_str).c_str(), ImVec2(64.0f, 64.0f))) { 
+                fNinOffset = fNin[4]; b4_str = "[ 10 ]"; b1_str = button_idStr[1]; b2_str = button_idStr[2]; b3_str = button_idStr[3]; b0_str = button_idStr[0];
+            }
+            ImGui::InputInt("Номинал Автомата А:", &fN, 1, 100, 0);
+            ImGui::Text(("Выбрано:" + std::to_string(fNinOffset) + "Введено:" + std::to_string(fN)).c_str());
             ImGui::TextUnformatted((fStrNominal).c_str());
             ImGui::TextUnformatted((fStrNominal1).c_str());
-            if (ImGui::Button("Calc", ImVec2(150.0f, 30.0f))) {
+            if (ImGui::Button("Расчитать", ImVec2(150.0f, 30.0f))) {
                 rs = ((float)fNinOffset / 100) * fN + fN;
                 fStrNominal = std::to_string(rs);
             }
 
             ImGui::SameLine();
-            if (ImGui::Button("Show Table", ImVec2(150.0f, 30.0f))) {
+            if (ImGui::Button("Показать таблицы сечении", ImVec2(150.0f, 30.0f))) {
                 fFrameOM = false;
                 fFrameDIA = false;
                 fFrameWA = false;
@@ -513,45 +576,45 @@ int main(int argc, char** argv)
             ImGui::End();
         }
         //
-        int64_t amperArrayCp[] ={11,15,17,23,26,30,41,50,80,100,140,170};
-        int64_t amperArrayAl[] = {0,0,0,0,21,24,32,39,60,75,105,130};
-        float WattArrayCp[] ={2.4f,3.3f,3.7f,5.0f,5.7f,6.6f,9.0f,11.0f,17.0f,22.0f,30.0f,37.0f};
-        float WattArrayAl[] = { 0.0f,0.0f,6.4f,8.7f,9.8f,11.0f,15.0f,19.0f,30.0f,38.0f,53.0f,64.0f};
-        float SectionArray[] = {0.5f,0.75f,1.0f,1.5f,2.0f,2.5f,4.0f,6.0f,10.0f,16.0f,25.0f,35.0f};
+        int64_t amperArrayCp[] = { 11,15,17,23,26,30,41,50,80,100,140,170 };
+        int64_t amperArrayAl[] = { 0,0,0,0,21,24,32,39,60,75,105,130 };
+        float WattArrayCp[] = { 2.4f,3.3f,3.7f,5.0f,5.7f,6.6f,9.0f,11.0f,17.0f,22.0f,30.0f,37.0f };
+        float WattArrayAl[] = { 0.0f,0.0f,6.4f,8.7f,9.8f,11.0f,15.0f,19.0f,30.0f,38.0f,53.0f,64.0f };
+        float SectionArray[] = { 0.5f,0.75f,1.0f,1.5f,2.0f,2.5f,4.0f,6.0f,10.0f,16.0f,25.0f,35.0f };
         ImGui::Text("Created by HCPP 2024");
         if (fTable) {
             if (ImGui::Button("X")) { fTable = false; }
             static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
             const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
-           if(ImGui::BeginTable("table2", 6, flags))
+            if (ImGui::BeginTable("table2", 6, flags))
             {
-               ImGui::TableSetupColumn("Copper", ImGuiTableColumnFlags_WidthFixed);
-               ImGui::TableSetupColumn("A", ImGuiTableColumnFlags_WidthFixed);
-               ImGui::TableSetupColumn("S", ImGuiTableColumnFlags_WidthFixed);
-               ImGui::TableSetupColumn("AL", ImGuiTableColumnFlags_WidthStretch);
-               ImGui::TableSetupColumn("A", ImGuiTableColumnFlags_WidthStretch);
-               ImGui::TableSetupColumn("V", ImGuiTableColumnFlags_WidthStretch);
-               ImGui::TableHeadersRow();
+                ImGui::TableSetupColumn("Медь", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("A", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("S", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("Алюминий", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("A", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("V", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableHeadersRow();
                 for (int row = 0; row < 12; row++)
                 {
                     ImGui::TableNextRow();
-                   
-                        ImGui::TableSetColumnIndex(0);
-                        ImGui::Text((std::to_string(WattArrayCp[row]) + "kW").c_str());
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::Text((std::to_string(amperArrayCp[row]) + "A").c_str());
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::Text((std::to_string(SectionArray[row]) + "mm").c_str());
-                        ImGui::TableSetColumnIndex(3);
-                        ImGui::Text((std::to_string(WattArrayAl[row]) + "kW").c_str());
-                        ImGui::TableSetColumnIndex(4);
-                        ImGui::Text((std::to_string(amperArrayAl[row]) + "A").c_str());
-                       // ImGui::Text(std::to_string(amperArrayAl[row]).c_str());
-                  
+
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text((std::to_string(WattArrayCp[row]) + "kW").c_str());
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text((std::to_string(amperArrayCp[row]) + "A").c_str());
+                    ImGui::TableSetColumnIndex(2);
+                    ImGui::Text((std::to_string(SectionArray[row]) + "mm").c_str());
+                    ImGui::TableSetColumnIndex(3);
+                    ImGui::Text((std::to_string(WattArrayAl[row]) + "kW").c_str());
+                    ImGui::TableSetColumnIndex(4);
+                    ImGui::Text((std::to_string(amperArrayAl[row]) + "A").c_str());
+                    // ImGui::Text(std::to_string(amperArrayAl[row]).c_str());
+
                 }
                 ImGui::EndTable();
             }
-            }
+        }
         if (fFramePH) {
             fFrameOM = false;
             fFrameDIA = false;
@@ -563,8 +626,8 @@ int main(int argc, char** argv)
             std::string data_f;
             std::string lvl_0;
             data_f = lvl_0 + std::to_string(fValue);
-            ImGui::Begin("Calc P Heater", &fFramePH);
-            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (fD_gpuModel + ": fps_count:" + std::to_string(io.Framerate)).c_str());
+            ImGui::Begin("Расчет мощности тена", &fFramePH);
+            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (": fps_count:" + std::to_string(io.Framerate)).c_str());
             ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
             ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
             if (ImGui::Button("X")) { fFramePH = false; }
@@ -572,7 +635,7 @@ int main(int argc, char** argv)
             ImGui::InputFloat("V:", &fVolt, 1, 1000, 0);
             ImGui::InputFloat("R:", &fR, 1, 1000, 0);
             //(fPV * fPV / fPR);
-            if (ImGui::Button("Calculate", ImVec2(130.0f, 50.0f)))
+            if (ImGui::Button("Расчитать", ImVec2(130.0f, 50.0f)))
             {
                 lvl_0 = "W:";
                 fValue = (fVolt * fVolt) / fR;
@@ -587,42 +650,40 @@ int main(int argc, char** argv)
             static float fWatt = 0;
             static bool v_state = false;
             static float fVoltageW = 0;
+            static float fVoltageW2 = 0;
             static float fAmp = 0;
             static float fValue = 0;
+            static float fValue2 = 0;
             std::string data_f;
             std::string lvl_0;
             data_f = lvl_0 + std::to_string(fValue);
-            ImGui::Begin("Watt to Amper", &fFrameWA);
-            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (fD_gpuModel + ": fps_count:" + std::to_string(io.Framerate)).c_str());
+            ImGui::Begin("Ватты в Ампера и наоборот", &fFrameWA);
+            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (": fps_count:" + std::to_string(io.Framerate)).c_str());
             ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
             ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
             if (ImGui::Button("X")) { fFrameWA = false; }
-            ImGui::Text("Watt");
-            ImGui::Checkbox("Reverd", &v_state);
-            ImGui::TextColored(ImVec4(150.f, 150.0f, 255.0f,1.0f), (data_f).c_str());
-            ImGui::InputFloat("Voltage", &fVoltageW, 1, 1000, 0);
-            if (v_state)
-            {
-                ImGui::InputFloat("Watt", &fWatt, 1, 1000, 0);
+            ImGui::Text("Ватты в Амперы");
+            ImGui::TextColored(ImVec4(150.f, 150.0f, 255.0f, 1.0f), (data_f).c_str());
+            ImGui::InputFloat("Вольтаж", &fVoltageW, 1, 1000, 0);
+                ImGui::InputFloat("Ватты", &fWatt, 1, 1000, 0);
                 if (fWatt > 0 && fVoltageW > 0)
                 {
-                    if (ImGui::Button("Calculate", ImVec2(130.0f, 50.0f)))
+                    if (ImGui::Button("Расчитать", ImVec2(130.0f, 50.0f)))
                     {
                         lvl_0 = "Watt";
                         fValue = fWatt / fVoltageW;
 
                     }
                 }
-            }
-            if (!v_state)
-            {
-                ImGui::InputFloat("Amper", &fAmp, 1, 1000, 0);
-                if (ImGui::Button("Calculate", ImVec2(130.0f, 50.0f)))
+                ImGui::Text("Амперы в Ватты");
+                ImGui::TextColored(ImVec4(150.f, 150.0f, 255.0f, 1.0f), (std::to_string(fValue2)).c_str());
+                ImGui::InputFloat("U", &fVoltageW2, 1, 1000, 0);
+                ImGui::InputFloat("I", &fAmp, 1, 1000, 0);
+                if (ImGui::Button("Расчитать.", ImVec2(130.0f, 50.0f)))
                 {
-                    lvl_0 = "Amper";
-                    fValue = fVoltageW * fAmp;
+                    lvl_0 = "Амперы";
+                    fValue2 = fVoltageW2 * fAmp;
                 }
-            }
             ImGui::End();
         }
         if (fFrameOM)
@@ -632,17 +693,17 @@ int main(int argc, char** argv)
             static float fResistor = 0;
             static float fVoltage = 0;
             static float fAmper = 0;
-            ImGui::Begin("Calc AMPER", &fFrameOM);
-            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (fD_gpuModel + ": fps_count:" + std::to_string(io.Framerate)).c_str());
+            ImGui::Begin("Расчет Ампер по ОМУ", &fFrameOM);
+            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (": fps_count:" + std::to_string(io.Framerate)).c_str());
             ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
             ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
             if (ImGui::Button("X")) { fFrameOM = false; }
-            ImGui::Text(("Amper:" + std::to_string(fAmper)).c_str());
-            ImGui::InputFloat("Voltage",&fVoltage, 1, 1000, 0);
-            ImGui::InputFloat("fResistor", &fResistor, 1, 1000, 0);
-            if (ImGui::Button("Calculate", ImVec2(150.0f, 60.f)))
+            ImGui::Text(("Амперы:" + std::to_string(fAmper)).c_str());
+            ImGui::InputFloat("Вольтаж", &fVoltage, 1, 1000, 0);
+            ImGui::InputFloat("Сопротивление", &fResistor, 1, 1000, 0);
+            if (ImGui::Button("Расчитать", ImVec2(150.0f, 60.f)))
             {
-                    fAmper =  fVoltage / fResistor;
+                fAmper = fVoltage / fResistor;
             }
             ImGui::End();
         }
@@ -653,18 +714,18 @@ int main(int argc, char** argv)
             float fPi = 3.14f;
             float fdata_0 = 0.0f;
             static float fR_mm2 = 0.0f;
-            ImGui::Begin("Diametr Calc", &fFrameDIA);
-            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (fD_gpuModel + ": fps_count:" + std::to_string(io.Framerate)).c_str());
+            ImGui::Begin("Расчет сечения из диаметра", &fFrameDIA);
+            ImGui::TextColored(ImVec4(0.20f, 1.0f, 0.40f, 1.0f), (": fps_count:" + std::to_string(io.Framerate)).c_str());
             ImGui::SetWindowSize(ImVec2(500.0f, 600.0f));
             ImGui::SetWindowPos(ImVec2(2.0f, 2.0f));
             if (ImGui::Button("X")) { fFrameDIA = false; }
-            ImGui::Text(("Section:" + std::to_string(fR_mm2)).c_str());
+            ImGui::Text(("Сечение:" + std::to_string(fR_mm2)).c_str());
             static float fDia_value = 0.0f;
-            ImGui::InputFloat("Diametr", &fDia_value, 0.0f, 100000.0f, 0);
-            if (ImGui::Button("Calculate", ImVec2(150.0f, 60.f)))
+            ImGui::InputFloat("Диаметр", &fDia_value, 0.0f, 100000.0f, 0);
+            if (ImGui::Button("Расчитать", ImVec2(150.0f, 60.f)))
             {
-               // fDA = (fD0 / 2) * (fD0 / 2) * fPi;
-               // fdata_0 = (fDA * fDA) * fPi;
+                // fDA = (fD0 / 2) * (fD0 / 2) * fPi;
+                // fdata_0 = (fDA * fDA) * fPi;
                 fR_mm2 = ((fDia_value / 2) * (fDia_value / 2) * fPi);
             }
             ImGui::End();
@@ -672,7 +733,7 @@ int main(int argc, char** argv)
         ImGui::End();
            // Rendering
         ImGui::Render();
-        glViewport(0, 0, 500, 500);
+        glViewport(0, 0, 329, 240);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
