@@ -34,11 +34,11 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 int main(int, char**)
 {
     // Create application window
-    WNDCLASSEXW wc = { sizeof(wc), CS_OWNDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Electrik Calc", nullptr };
+    WNDCLASSEXW wc = { sizeof(wc), CS_OWNDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Калькулятор электроника v 1.0.1(beta)DX9_x86", nullptr };
     wc.hIcon = LoadIcon(wc.hInstance, MAKEINTRESOURCE(101));
     ::RegisterClassExW(&wc);
 
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Electrik Calc", WS_OVERLAPPEDWINDOW, 100, 100, 500, 600, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Калькулятор электроника v 1.0.1(beta)DX9_x86", WS_OVERLAPPEDWINDOW, 100, 100, 500, 600, nullptr, nullptr, wc.hInstance, nullptr);
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
     {
@@ -194,7 +194,7 @@ int main(int, char**)
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
        // std::cout << "GPU: Unit OK" << std::endl;
-        ImGui::Begin("Калькулятор электроника v 1.0.1(beta)DX9_x86", &fFr_main);
+        ImGui::Begin("Калькулятор электроника v 1.0.1(beta)DX9_x86", &fFr_main, ImGuiWindowFlags_NoTitleBar);
         //std::cout << "GPU: Render Frame:"<<io.Framerate << std::endl;
         ImGuiStyle& style = ImGui::GetStyle();
         if (bDarkStyle) {
