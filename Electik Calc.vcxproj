@@ -170,15 +170,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imconfig.h" />
-    <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_internal.h" />
     <ClInclude Include="imgui_impl_opengl3.h" />
     <ClInclude Include="imgui_impl_opengl3_loader.h" />
     <ClInclude Include="imgui_impl_win32.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\misc\natvis\imgui.natvis" />
     <None Include="..\README.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="d.ico" />
+    <Image Include="Release\logo.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
