@@ -12,6 +12,7 @@
     <ClCompile Include="imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui_impl_win32.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="imgui_stdlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imconfig.h" />
@@ -21,6 +22,7 @@
     <ClInclude Include="imgui_impl_win32.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="imgui_stdlib.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Electik Calc.rc" />

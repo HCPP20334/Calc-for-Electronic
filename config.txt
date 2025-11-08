@@ -1,2 +1,4 @@
-dark=true
-dark=true
+elcTheme=dark_theme
+elcFont=PixelizerBold
+elc-20334
+-0

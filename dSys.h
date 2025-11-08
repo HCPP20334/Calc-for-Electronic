@@ -4,6 +4,7 @@
 #include <sysinfoapi.h>
 #include <stdint.h>//-
 #include <string>
+#include <array>
 int64_t ps_apiL(int64_t fps_count);
 int64_t fPerfomanceInfo(int64_t fPdataId);
 float fMemStatus(int64_t fMData_0);
@@ -11,16 +12,15 @@ int64_t fLTime(int64_t fLtData);
 int64_t CPUArch();
 std::string fCPUType();
 
-/*
- * C++11 MinGW Compiler
- * for work add to Projects libpsapi.a & VS -> add #pragma comment(lib, "psapi.lib");
-  func ps_apiL - send Faulting Pc and Faulting Va
-  func fPerfomanceInfo return Perf Call Info
-  func fMemStatus return call mem data's 
-  func fLTTime sen Local Time
-  func CPUArch send call cpu_bit's
-  func fCPUType return cpu_type ('AMD x64','Intel x86')
- */
+struct v4i64 {
+	int64_t x, y, z, w;
+	constexpr v4i64() : x(0), y(0), z(0), w(0) {}
+	constexpr v4i64(int64_t _x, int64_t _y, int64_t _z, int64_t _w) : x(_x), y(_y), z(_z), w(_w) {}
+};
+int64_t rdi64(int64_t value) {
+	srand(time(0));
+	return rand() % value;
+}
 int64_t ps_apiL(int64_t fps_count)
 {
 	PSAPI_WS_WATCH_INFORMATION fPs_data;
