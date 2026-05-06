@@ -11,3 +11,5 @@
 
 
 также требуется Windows XP SP3 x86 
+
+ Скачать: <a href="https://github.com/HCPP20334/Calc-for-Electronic/raw/refs/heads/main/xp/ElectricCalc(x86)CXX14%20(WinXP).zip"></a>
